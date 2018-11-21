@@ -1,0 +1,82 @@
+FROM composer:1.7.2 as application
+
+LABEL maintainer "Felipe Reis - https://github.com/devfelipereis"
+
+WORKDIR /app
+
+COPY composer.json composer.lock /app/
+RUN composer install  \
+    --ignore-platform-reqs \
+    --no-ansi \
+    --no-autoloader \
+    --no-dev \
+    --no-interaction \
+    --no-scripts
+
+COPY . /app/
+RUN composer dump-autoload --optimize --classmap-authoritative
+
+FROM sickp/alpine-nginx:1.14.0
+
+ADD https://php.codecasts.rocks/php-alpine.rsa.pub /etc/apk/keys/php-alpine.rsa.pub
+RUN echo "@php https://php.codecasts.rocks/v3.7/php-7.2" >> /etc/apk/repositories
+RUN apk add --no-cache --update \
+    ca-certificates \
+    php@php \
+    php-common@php \
+    php-ctype@php \
+    php-curl@php \
+    php-fpm@php \
+    php-gd@php \
+    php-intl@php \
+    php-json@php \
+    php-mbstring@php \
+    php-openssl@php \
+    php-pdo@php \
+    php-xml@php \
+    php-zip@php \
+    php-pdo_mysql@php \
+    php-memcached@php \
+    php-phar@php \
+    php-pcntl@php \
+    php-dom@php \
+    php-posix@php \
+    bash git grep dcron tzdata su-exec \
+    supervisor
+
+# Configure time
+RUN echo "America/Sao_Paulo" > /etc/timezone && \
+    cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+    apk del tzdata && \
+    rm /var/cache/apk/*
+
+# CRON SETUP
+COPY docker/cron/crontab /var/spool/cron/crontabs/root
+RUN chmod -R 0644 /var/spool/cron/crontabs
+
+RUN mkdir -p /var/www/html && \
+    mkdir -p /var/cache/nginx && \
+    mkdir -p /var/lib/nginx && \
+    chown -R nginx:nginx /var/cache/nginx /var/lib/nginx && \
+    chmod -R g+rw /var/cache/nginx /var/lib/nginx /etc/php7/php-fpm.d && \
+    ln -s /usr/bin/php7 /usr/bin/php
+
+COPY docker/conf/php-fpm-pool.conf /etc/php7/php-fpm.d/www.conf
+COPY docker/conf/supervisord.conf /etc/supervisor/supervisord.conf
+COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
+COPY docker/conf/nginx-site.prod.conf /etc/nginx/conf.d/default.conf
+COPY docker/entrypoint.prod.sh /sbin/entrypoint.sh
+
+WORKDIR /var/www/html/
+
+COPY --chown=nginx:nginx --from=application /app .
+
+RUN chmod -R ug+rwx storage bootstrap/cache
+
+VOLUME /var/www/html/storage
+
+EXPOSE 8000 443
+
+ENTRYPOINT ["/sbin/entrypoint.sh"]
+
+CMD ["true"]

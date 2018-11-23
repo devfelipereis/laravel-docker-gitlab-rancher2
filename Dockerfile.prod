@@ -71,8 +71,6 @@ WORKDIR /var/www/html/
 
 COPY --chown=nginx:nginx --from=application /app .
 
-RUN chmod -R ug+rwx storage bootstrap/cache
-
 VOLUME /var/www/html/storage
 
 EXPOSE 8000 443

@@ -61,8 +61,6 @@ COPY --chown=nginx:nginx ./ .
 
 COPY --from=composer:1.7.2 /usr/bin/composer /usr/bin/composer
 
-RUN chmod -R ug+rwx storage bootstrap/cache
-
 VOLUME /var/www/html/storage
 
 EXPOSE 8000 443

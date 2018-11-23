@@ -7,6 +7,15 @@ then
     exit 1
 fi
 
+if [ ! -f storage/.initialized ]; then
+    touch storage/.initialized;
+    # laravel storage folder structure (v5.4+)
+    mkdir -p storage/{app/public,framework/{cache,sessions,testing,views},logs}
+
+    chown -R nginx:nginx storage
+    chmod -R ug+rwx storage bootstrap/cache
+fi
+
 su-exec nginx:nginx composer install && php artisan config:cache
 /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
 

@@ -73,7 +73,7 @@ COPY --chown=nginx:nginx --from=application /app .
 
 VOLUME /var/www/html/storage
 
-EXPOSE 8000 443
+EXPOSE 8000
 
 ENTRYPOINT ["/sbin/entrypoint.sh"]
 

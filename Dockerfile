@@ -53,6 +53,7 @@ COPY docker/conf/php-fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 COPY docker/conf/supervisord.conf /etc/supervisor/supervisord.conf
 COPY docker/conf/nginx.conf /etc/nginx/nginx.conf
 COPY docker/conf/nginx-site.conf /etc/nginx/conf.d/default.conf
+# COPY docker/conf/php.ini /etc/php7/conf.d/50-settings.ini
 COPY docker/entrypoint.sh /sbin/entrypoint.sh
 
 WORKDIR /var/www/html/

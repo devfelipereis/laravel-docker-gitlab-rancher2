@@ -4,6 +4,9 @@ services:
   application:
     build:
       context: .
+      args:
+        - UID=${UID}
+        - GID=${GID}
     volumes:
       - ./:/var/www/html
     ports:

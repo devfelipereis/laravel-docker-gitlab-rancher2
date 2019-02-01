@@ -2,6 +2,9 @@ FROM sickp/alpine-nginx:1.14.0
 
 LABEL maintainer "Felipe Reis - https://github.com/devfelipereis"
 
+ARG UID=1000
+ARG GID=1000
+
 ADD https://php.codecasts.rocks/php-alpine.rsa.pub /etc/apk/keys/php-alpine.rsa.pub
 RUN echo "@php https://php.codecasts.rocks/v3.7/php-7.2" >> /etc/apk/repositories
 RUN apk add --no-cache --update \
@@ -25,8 +28,11 @@ RUN apk add --no-cache --update \
     php-pcntl@php \
     php-dom@php \
     php-posix@php \
-    bash git grep dcron tzdata su-exec \
+    bash git grep dcron tzdata su-exec shadow \
     supervisor
+
+# Sync user and group with the host
+RUN usermod -u ${UID} nginx && groupmod -g ${GID} nginx
 
 # Configure time
 RUN echo "America/Sao_Paulo" > /etc/timezone && \

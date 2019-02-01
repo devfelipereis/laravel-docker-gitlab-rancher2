@@ -3,7 +3,7 @@ TESTIMAGE=${PROJECT}:testing
 USER=nginx
 
 up:
-	docker-compose up --build
+	env UID=$$(id -u) GID=$$(id -g)  docker-compose up --build
 
 down:
 	docker-compose down
@@ -19,7 +19,7 @@ sh\:db:
 
 setup:
 	cp .env.example .env
-	docker-compose up
+	env UID=$$(id -u) GID=$$(id -g)  docker-compose up
 
 key\:db:
 	echo "Generating key..."

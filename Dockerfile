@@ -1,12 +1,12 @@
-FROM sickp/alpine-nginx:1.14.0
+FROM nginx:1.14.2-alpine
 
 LABEL maintainer "Felipe Reis - https://github.com/devfelipereis"
 
 ARG UID=1000
 ARG GID=1000
 
-ADD https://php.codecasts.rocks/php-alpine.rsa.pub /etc/apk/keys/php-alpine.rsa.pub
-RUN echo "@php https://php.codecasts.rocks/v3.7/php-7.2" >> /etc/apk/repositories
+ADD https://dl.bintray.com/php-alpine/key/php-alpine.rsa.pub /etc/apk/keys/php-alpine.rsa.pub
+RUN echo "@php https://dl.bintray.com/php-alpine/v3.9/php-7.3" >> /etc/apk/repositories
 RUN apk add --no-cache --update \
     ca-certificates \
     php@php \
@@ -20,9 +20,10 @@ RUN apk add --no-cache --update \
     php-mbstring@php \
     php-openssl@php \
     php-pdo@php \
+    php-pdo_mysql@php \
+    php-mysqlnd@php \
     php-xml@php \
     php-zip@php \
-    php-pdo_mysql@php \
     php-memcached@php \
     php-phar@php \
     php-pcntl@php \
@@ -37,8 +38,9 @@ RUN usermod -u ${UID} nginx && groupmod -g ${GID} nginx
 # Configure time
 RUN echo "America/Sao_Paulo" > /etc/timezone && \
     cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
-    apk del tzdata && \
-    rm /var/cache/apk/*
+    apk del --no-cache tzdata && \
+    rm -rf /var/cache/apk/* && \
+    rm -rf /tmp/*
 
 # CRON SETUP
 COPY docker/cron/crontab /var/spool/cron/crontabs/root
@@ -66,7 +68,7 @@ WORKDIR /var/www/html/
 
 COPY --chown=nginx:nginx ./ .
 
-COPY --from=composer:1.7.2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:1.8.3 /usr/bin/composer /usr/bin/composer
 
 VOLUME /var/www/html/storage
 

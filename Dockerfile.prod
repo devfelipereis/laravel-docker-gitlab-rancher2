@@ -1,4 +1,5 @@
-FROM composer:1.7.2 as application
+# laravel composer dependencies
+FROM composer:1.8.3 as application
 
 LABEL maintainer "Felipe Reis - https://github.com/devfelipereis"
 
@@ -16,10 +17,10 @@ RUN composer install  \
 COPY . /app/
 RUN composer dump-autoload --optimize --classmap-authoritative
 
-FROM sickp/alpine-nginx:1.14.0
+FROM nginx:1.14.2-alpine
 
 ADD https://php.codecasts.rocks/php-alpine.rsa.pub /etc/apk/keys/php-alpine.rsa.pub
-RUN echo "@php https://php.codecasts.rocks/v3.7/php-7.2" >> /etc/apk/repositories
+RUN echo "@php https://php.codecasts.rocks/v3.9/php-7.3" >> /etc/apk/repositories
 RUN apk add --no-cache --update \
     ca-certificates \
     php@php \
@@ -33,22 +34,24 @@ RUN apk add --no-cache --update \
     php-mbstring@php \
     php-openssl@php \
     php-pdo@php \
+    php-pdo_mysql@php \
+    php-mysqlnd@php \
     php-xml@php \
     php-zip@php \
-    php-pdo_mysql@php \
     php-memcached@php \
     php-phar@php \
     php-pcntl@php \
     php-dom@php \
     php-posix@php \
-    bash git grep dcron tzdata su-exec \
+    bash git grep dcron tzdata su-exec shadow \
     supervisor
 
 # Configure time
 RUN echo "America/Sao_Paulo" > /etc/timezone && \
     cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
-    apk del tzdata && \
-    rm /var/cache/apk/*
+    apk del --no-cache tzdata && \
+    rm -rf /var/cache/apk/* && \
+    rm -rf /tmp/*
 
 # CRON SETUP
 COPY docker/cron/crontab /var/spool/cron/crontabs/root

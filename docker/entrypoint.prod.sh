@@ -10,7 +10,7 @@ if [ ! -f storage/.initialized ]; then
     chmod -R ug+rwx storage bootstrap/cache
 fi
 
-su-exec nginx:nginx php artisan config:cache
+su-exec nginx:nginx php artisan config:cache && php artisan view:clear
 
 /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
 

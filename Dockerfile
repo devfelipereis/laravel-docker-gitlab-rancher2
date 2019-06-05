@@ -8,7 +8,7 @@ ARG GID=1000
 ADD https://dl.bintray.com/php-alpine/key/php-alpine.rsa.pub /etc/apk/keys/php-alpine.rsa.pub
 RUN echo "@php https://dl.bintray.com/php-alpine/v3.9/php-7.3" >> /etc/apk/repositories
 RUN apk add --no-cache --update \
-    ca-certificates \
+    ca-certificates openssl \
     php@php \
     php-common@php \
     php-ctype@php \

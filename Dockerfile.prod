@@ -22,7 +22,7 @@ FROM nginx:1.14.2-alpine
 ADD https://php.codecasts.rocks/php-alpine.rsa.pub /etc/apk/keys/php-alpine.rsa.pub
 RUN echo "@php https://php.codecasts.rocks/v3.9/php-7.3" >> /etc/apk/repositories
 RUN apk add --no-cache --update \
-    ca-certificates \
+    ca-certificates openssl \
     php@php \
     php-common@php \
     php-ctype@php \

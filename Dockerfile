@@ -25,7 +25,7 @@ RUN apk add --no-cache --update \
     php-xml@php \
     php-zip@php \
     php-redis@php \
-    php7-memcached@php=3.1.4-r1 \
+    php-memcached@php \
     php-phar@php \
     php-pcntl@php \
     php-dom@php \
